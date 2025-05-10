@@ -3,10 +3,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { Bell, HelpCircle } from "lucide-react";
+import { Bell, HelpCircle, Menu } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AppHeader = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const handleNotificationClick = () => {
     toast({
@@ -29,9 +31,11 @@ const AppHeader = () => {
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ocean to-ocean-light flex items-center justify-center text-white font-bold">
             D
           </div>
-          <span className="text-xl font-display font-bold text-ocean">
-            Discover Diani
-          </span>
+          {!isMobile && (
+            <span className="text-xl font-display font-bold text-ocean">
+              Discover Diani
+            </span>
+          )}
         </Link>
       </div>
       
@@ -45,14 +49,16 @@ const AppHeader = () => {
           <Bell className="h-5 w-5" />
         </Button>
         
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={handleHelpClick}
-        >
-          <HelpCircle className="h-5 w-5" />
-        </Button>
+        {!isMobile && (
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={handleHelpClick}
+          >
+            <HelpCircle className="h-5 w-5" />
+          </Button>
+        )}
         
         <Avatar className="h-9 w-9 border-2 border-ocean-light hover-scale">
           <AvatarImage src="https://github.com/shadcn.png" className="object-cover" />

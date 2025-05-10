@@ -2,9 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MapPin, Star } from "lucide-react";
+import { Heart, MapPin, Star, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Listing {
   id: number;
@@ -17,11 +18,14 @@ interface Listing {
 
 interface ListingsPanelProps {
   listings: Listing[];
+  onViewDetails?: (listing: Listing) => void;
 }
 
-const ListingsPanel = ({ listings }: ListingsPanelProps) => {
+const ListingsPanel = ({ listings, onViewDetails }: ListingsPanelProps) => {
   const [savedListings, setSavedListings] = useState<number[]>([]);
+  const [expandedListings, setExpandedListings] = useState<number[]>([]);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleSave = (id: number) => {
     if (savedListings.includes(id)) {
@@ -39,12 +43,26 @@ const ListingsPanel = ({ listings }: ListingsPanelProps) => {
     }
   };
 
-  const handleViewDetails = (title: string) => {
-    toast({
-      title: "Opening details",
-      description: `Viewing details for ${title}`,
-    });
+  const toggleExpand = (id: number) => {
+    if (expandedListings.includes(id)) {
+      setExpandedListings(expandedListings.filter(listingId => listingId !== id));
+    } else {
+      setExpandedListings([...expandedListings, id]);
+    }
   };
+
+  const handleViewDetails = (listing: Listing) => {
+    if (onViewDetails) {
+      onViewDetails(listing);
+    } else {
+      toast({
+        title: "Opening details",
+        description: `Viewing details for ${listing.title}`,
+      });
+    }
+  };
+
+  const isExpanded = (id: number) => expandedListings.includes(id);
 
   return (
     <div className="p-4 h-full overflow-y-auto">
@@ -57,68 +75,105 @@ const ListingsPanel = ({ listings }: ListingsPanelProps) => {
       
       <div className="space-y-4">
         {listings.map((listing) => (
-          <Card key={listing.id} className="overflow-hidden animate-in hover:shadow-md transition-shadow">
-            <div className="aspect-video relative overflow-hidden">
-              <img
-                src={listing.image}
-                alt={listing.title}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute top-2 right-2 bg-black/30 hover:bg-black/50 text-white rounded-full"
-                onClick={() => handleSave(listing.id)}
-              >
-                <Heart 
-                  className={`h-4 w-4 ${savedListings.includes(listing.id) ? 'text-red-500 fill-red-500' : ''}`}
+          <Card 
+            key={listing.id} 
+            className="overflow-hidden animate-in hover:shadow-md transition-shadow"
+          >
+            <div className="flex flex-col md:flex-row">
+              {/* Image section */}
+              <div className={`relative ${isMobile ? 'w-full aspect-video' : 'md:w-1/3 md:min-h-[10rem]'}`}>
+                <img
+                  src={listing.image}
+                  alt={listing.title}
+                  className="w-full h-full object-cover"
                 />
-              </Button>
-            </div>
-            
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold">{listing.title}</h3>
-                <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
-                  <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                  <span className="ml-1 text-xs font-medium text-yellow-800">{listing.rating}</span>
-                </div>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mb-3">
-                {listing.description}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <Badge 
-                  variant="outline"
-                  className="capitalize bg-secondary text-xs font-medium"
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute top-2 right-2 bg-black/30 hover:bg-black/50 text-white rounded-full"
+                  onClick={() => handleSave(listing.id)}
                 >
-                  {listing.category}
-                </Badge>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  <span>Diani Beach</span>
-                </div>
+                  <Heart 
+                    className={`h-4 w-4 ${savedListings.includes(listing.id) ? 'text-red-500 fill-red-500' : ''}`}
+                  />
+                </Button>
               </div>
-            </CardContent>
-            
-            <CardFooter className="p-4 pt-0 flex justify-end gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => handleSave(listing.id)}
-              >
-                {savedListings.includes(listing.id) ? 'Saved' : 'Save'}
-              </Button>
-              <Button 
-                size="sm" 
-                className="bg-ocean hover:bg-ocean-dark"
-                onClick={() => handleViewDetails(listing.title)}
-              >
-                View Details
-              </Button>
-            </CardFooter>
+              
+              {/* Content section */}
+              <div className={`flex-1 flex flex-col`}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold">{listing.title}</h3>
+                    <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
+                      <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                      <span className="ml-1 text-xs font-medium text-yellow-800">{listing.rating}</span>
+                    </div>
+                  </div>
+                  
+                  {isMobile && !isExpanded(listing.id) ? (
+                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                      {listing.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {listing.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex items-center justify-between">
+                    <Badge 
+                      variant="outline"
+                      className="capitalize bg-secondary text-xs font-medium"
+                    >
+                      {listing.category}
+                    </Badge>
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      <span>Diani Beach</span>
+                    </div>
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="p-4 pt-0 flex justify-between gap-2 flex-wrap">
+                  {isMobile && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-1 text-xs"
+                      onClick={() => toggleExpand(listing.id)}
+                    >
+                      {isExpanded(listing.id) ? (
+                        <>
+                          <ChevronUp className="h-3 w-3" />
+                          <span>Show Less</span>
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-3 w-3" />
+                          <span>Show More</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  <div className="flex ml-auto gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleSave(listing.id)}
+                    >
+                      {savedListings.includes(listing.id) ? 'Saved' : 'Save'}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="bg-ocean hover:bg-ocean-dark"
+                      onClick={() => handleViewDetails(listing)}
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </CardFooter>
+              </div>
+            </div>
           </Card>
         ))}
       </div>
