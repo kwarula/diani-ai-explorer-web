@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { Bell, HelpCircle, Menu } from "lucide-react";
+import { Bell, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const AppHeader = () => {
@@ -28,9 +28,11 @@ const AppHeader = () => {
     <header className="w-full h-16 border-b flex items-center justify-between px-4 bg-background z-10 shadow-soft">
       <div className="flex items-center">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ocean to-ocean-light flex items-center justify-center text-white font-bold">
-            D
-          </div>
+          <img 
+            src="/lovable-uploads/ad283c30-915d-449f-a51d-0c02bbacb33b.png" 
+            alt="Discover Diani Logo" 
+            className="h-8 w-auto"
+          />
           {!isMobile && (
             <span className="text-xl font-display font-bold text-ocean">
               Discover Diani

@@ -9,7 +9,14 @@ const LandingPage = () => {
       {/* Navigation */}
       <header className="w-full py-4 px-6 flex justify-between items-center bg-white/80 backdrop-blur-sm fixed top-0 z-10">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold text-ocean">Discover Diani</h1>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/ad283c30-915d-449f-a51d-0c02bbacb33b.png" 
+              alt="Discover Diani Logo" 
+              className="h-8 w-auto"
+            />
+            <h1 className="text-xl font-bold text-ocean">Discover Diani</h1>
+          </div>
         </div>
         <div className="flex gap-4">
           <Button variant="ghost" asChild>
