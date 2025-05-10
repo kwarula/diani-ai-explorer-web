@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Grid, User, LogOut, Menu } from "lucide-react";
 import AppHeader from "./AppHeader";
@@ -42,11 +41,10 @@ const AppLayout = () => {
             <div className="flex flex-col h-full pt-4">
               <SidebarContent className="flex flex-col flex-1 px-2">
                 <div className="space-y-2 mb-8">
-                  <SidebarTrigger asChild>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SidebarTrigger>
+                  {/* Fix: SidebarTrigger is removed and replaced with a regular Button */}
+                  <Button variant="ghost" size="icon" className="md:hidden">
+                    <Menu className="h-5 w-5" />
+                  </Button>
                 </div>
                 
                 <div className="flex-1 flex flex-col space-y-2">
