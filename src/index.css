@@ -90,8 +90,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
   }
 }
 
@@ -104,7 +107,23 @@
     @apply bg-gradient-to-r from-coral via-ocean to-ocean-light;
   }
   
+  .glass-card {
+    @apply backdrop-blur-md bg-white/80 dark:bg-black/40 border border-white/20 dark:border-white/10;
+  }
+
+  .shadow-soft {
+    @apply shadow-lg shadow-black/5;
+  }
+  
   .text-balance {
     text-wrap: balance;
+  }
+
+  .animate-in {
+    @apply animate-fade-in;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
   }
 }

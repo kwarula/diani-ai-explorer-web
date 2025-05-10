@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { SidebarProvider, Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Grid, User, LogOut, Menu } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import AppHeader from "./AppHeader";
 import ChatPanel from "./ChatPanel";
 import ExplorePanel from "./ExplorePanel";
@@ -14,6 +16,7 @@ const AppLayout = () => {
   const [activePanel, setActivePanel] = useState<PanelType>("chat");
   const [showListings, setShowListings] = useState(false);
   const [listingsData, setListingsData] = useState<any[]>([]);
+  const { toast } = useToast();
   
   const handleNavClick = (panel: PanelType) => {
     setActivePanel(panel);
@@ -30,6 +33,15 @@ const AppLayout = () => {
     setListingsData(mockListings);
     setShowListings(true);
   };
+
+  const handleSignOut = () => {
+    toast({
+      title: "Signing out",
+      description: "You have been signed out successfully",
+    });
+    // In a real app, we would handle the sign out logic here
+    // and redirect the user to the login page
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,7 +49,7 @@ const AppLayout = () => {
       
       <div className="flex flex-1 overflow-hidden">
         <SidebarProvider>
-          <Sidebar className="border-r">
+          <Sidebar className="border-r shadow-sm">
             <div className="flex flex-col h-full pt-4">
               <SidebarContent className="flex flex-col flex-1 px-2">
                 <div className="space-y-2 mb-8">
@@ -50,7 +62,7 @@ const AppLayout = () => {
                 <div className="flex-1 flex flex-col space-y-2">
                   <Button
                     variant={activePanel === "chat" ? "default" : "ghost"}
-                    className="justify-start gap-2"
+                    className="justify-start gap-2 font-medium"
                     onClick={() => handleNavClick("chat")}
                   >
                     <MessageSquare className="h-5 w-5" />
@@ -59,7 +71,7 @@ const AppLayout = () => {
                   
                   <Button
                     variant={activePanel === "explore" ? "default" : "ghost"}
-                    className="justify-start gap-2"
+                    className="justify-start gap-2 font-medium"
                     onClick={() => handleNavClick("explore")}
                   >
                     <Grid className="h-5 w-5" />
@@ -68,7 +80,7 @@ const AppLayout = () => {
                   
                   <Button
                     variant={activePanel === "profile" ? "default" : "ghost"}
-                    className="justify-start gap-2"
+                    className="justify-start gap-2 font-medium"
                     onClick={() => handleNavClick("profile")}
                   >
                     <User className="h-5 w-5" />
@@ -77,7 +89,11 @@ const AppLayout = () => {
                 </div>
                 
                 <div className="pb-4">
-                  <Button variant="ghost" className="justify-start gap-2 w-full text-muted-foreground">
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start gap-2 w-full text-muted-foreground hover:text-destructive"
+                    onClick={handleSignOut}
+                  >
                     <LogOut className="h-5 w-5" />
                     <span>Sign Out</span>
                   </Button>
@@ -86,23 +102,29 @@ const AppLayout = () => {
             </div>
           </Sidebar>
           
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden bg-gray-50/50">
             <div className={`flex-1 overflow-y-auto transition-all ${showListings ? 'max-w-[50%] md:max-w-[60%]' : 'max-w-full'}`}>
               {activePanel === "chat" && (
-                <ChatPanel onSendQuery={handleChatQuery} />
+                <div className="h-full bg-white">
+                  <ChatPanel onSendQuery={handleChatQuery} />
+                </div>
               )}
               
               {activePanel === "explore" && (
-                <ExplorePanel onCategorySelect={handleChatQuery} />
+                <div className="h-full bg-white">
+                  <ExplorePanel onCategorySelect={handleChatQuery} />
+                </div>
               )}
               
               {activePanel === "profile" && (
-                <ProfilePanel />
+                <div className="h-full bg-white">
+                  <ProfilePanel />
+                </div>
               )}
             </div>
             
             {showListings && (
-              <div className="w-1/2 md:w-[40%] border-l overflow-y-auto bg-background">
+              <div className="w-1/2 md:w-[40%] border-l overflow-y-auto bg-white shadow-[-4px_0_12px_-6px_rgba(0,0,0,0.05)]">
                 <ListingsPanel listings={listingsData} />
               </div>
             )}

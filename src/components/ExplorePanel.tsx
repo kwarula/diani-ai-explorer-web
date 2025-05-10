@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Utensils, Bed, Palmtree, 
-  ShoppingBag, Compass, Car 
+  ShoppingBag, Compass, Car,
+  Camera, Wine, Users, Umbrella
 } from "lucide-react";
 
 interface ExplorePanelProps {
@@ -54,12 +55,40 @@ const ExplorePanel = ({ onCategorySelect }: ExplorePanelProps) => {
       icon: <Car className="h-12 w-12 text-ocean" />,
       query: "How can I get around Diani Beach?"
     },
+    {
+      id: 7,
+      title: "Photography Spots",
+      description: "Best locations for memorable photos",
+      icon: <Camera className="h-12 w-12 text-ocean" />,
+      query: "Where are the best photography spots in Diani?"
+    },
+    {
+      id: 8,
+      title: "Nightlife",
+      description: "Bars, clubs and evening entertainment",
+      icon: <Wine className="h-12 w-12 text-ocean" />,
+      query: "What's the nightlife like in Diani Beach?"
+    },
+    {
+      id: 9,
+      title: "Group Activities",
+      description: "Things to do with friends and family",
+      icon: <Users className="h-12 w-12 text-ocean" />,
+      query: "What activities can I do with a group in Diani?"
+    },
+    {
+      id: 10,
+      title: "Beach Spots",
+      description: "Best beach areas and facilities",
+      icon: <Umbrella className="h-12 w-12 text-ocean" />,
+      query: "What are the best beach spots in Diani?"
+    },
   ];
   
   return (
     <div className="p-6 h-full overflow-y-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Explore Diani</h1>
+        <h1 className="text-2xl font-display font-bold mb-2 text-gray-800">Explore Diani</h1>
         <p className="text-muted-foreground">
           Choose a category to discover places and experiences in Diani Beach
         </p>
@@ -67,16 +96,19 @@ const ExplorePanel = ({ onCategorySelect }: ExplorePanelProps) => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category) => (
-          <Card key={category.id} className="overflow-hidden hover:shadow-md transition-shadow">
+          <Card 
+            key={category.id} 
+            className="overflow-hidden hover:shadow-md transition-shadow animate-in group hover:border-ocean"
+          >
             <CardContent className="p-6 flex flex-col items-center text-center">
-              <div className="mb-4">
+              <div className="mb-4 transform group-hover:scale-110 transition-transform">
                 {category.icon}
               </div>
-              <h2 className="text-lg font-semibold mb-2">{category.title}</h2>
+              <h2 className="text-lg font-display font-semibold mb-2">{category.title}</h2>
               <p className="text-muted-foreground text-sm mb-4">{category.description}</p>
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full group-hover:bg-ocean group-hover:text-white transition-colors"
                 onClick={() => onCategorySelect(category.query)}
               >
                 Explore

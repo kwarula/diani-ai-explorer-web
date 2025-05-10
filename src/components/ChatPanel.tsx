@@ -1,8 +1,9 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, Image, Paperclip } from "lucide-react";
+import { Mic, Send, Image, Paperclip, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatMessage {
   id: string;
@@ -17,6 +18,7 @@ interface ChatPanelProps {
 
 const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
   const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
@@ -25,6 +27,16 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
       timestamp: new Date(),
     },
   ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   
   const handleSend = () => {
     if (!input.trim()) return;
@@ -40,8 +52,12 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
     setMessages([...messages, userMessage]);
     onSendQuery(input); // Send to parent for listings
     
+    // Show typing indicator
+    setIsTyping(true);
+    
     // Simulate AI response
     setTimeout(() => {
+      setIsTyping(false);
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         content: getAIResponse(input),
@@ -50,7 +66,7 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
       };
       
       setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+    }, 1500);
     
     setInput("");
   };
@@ -70,8 +86,12 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
       setMessages([...messages, userMessage]);
       onSendQuery(suggestion);
       
+      // Show typing indicator
+      setIsTyping(true);
+      
       // Simulate AI response
       setTimeout(() => {
+        setIsTyping(false);
         const aiResponse: ChatMessage = {
           id: (Date.now() + 1).toString(),
           content: getAIResponse(suggestion),
@@ -80,8 +100,36 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
         };
         
         setMessages((prev) => [...prev, aiResponse]);
-      }, 1000);
+      }, 1500);
     }, 10);
+  };
+  
+  const handleMicClick = () => {
+    toast({
+      title: "Voice input",
+      description: "Voice input feature coming soon!",
+    });
+  };
+  
+  const handleImageClick = () => {
+    toast({
+      title: "Image upload",
+      description: "Image upload feature coming soon!",
+    });
+  };
+  
+  const handleAttachmentClick = () => {
+    toast({
+      title: "File attachment",
+      description: "File attachment feature coming soon!",
+    });
+  };
+  
+  const formatMessageTime = (date: Date) => {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
   
   return (
@@ -100,30 +148,42 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
                 message.sender === "user"
                   ? "bg-ocean text-white"
                   : "bg-gray-100 text-gray-800"
-              }`}
+              } animate-in`}
             >
-              <p>{message.content}</p>
+              <p className="whitespace-pre-wrap">{message.content}</p>
               <div
                 className={`text-xs mt-1 ${
                   message.sender === "user" ? "text-blue-100" : "text-gray-500"
                 }`}
               >
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {formatMessageTime(message.timestamp)}
               </div>
             </div>
           </div>
         ))}
+        
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-xl p-3 bg-gray-100 text-gray-800">
+              <div className="flex space-x-1">
+                <div className="h-2 w-2 rounded-full bg-gray-400 animate-pulse"></div>
+                <div className="h-2 w-2 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: "0.2s" }}></div>
+                <div className="h-2 w-2 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
       </div>
       
       {/* Suggestions */}
       <div className="p-3 border-t">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           <Button 
             variant="outline" 
             size="sm"
+            className="whitespace-nowrap bg-secondary hover:bg-secondary/80"
             onClick={() => handleSuggestionClick("Show me best restaurants in Diani")}
           >
             Best restaurants
@@ -131,6 +191,7 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
           <Button 
             variant="outline" 
             size="sm"
+            className="whitespace-nowrap bg-secondary hover:bg-secondary/80"
             onClick={() => handleSuggestionClick("What activities can I do today?")}
           >
             Activities today
@@ -138,6 +199,7 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
           <Button 
             variant="outline" 
             size="sm"
+            className="whitespace-nowrap bg-secondary hover:bg-secondary/80"
             onClick={() => handleSuggestionClick("Luxury hotels with ocean view")}
           >
             Luxury hotels
@@ -145,36 +207,68 @@ const ChatPanel = ({ onSendQuery }: ChatPanelProps) => {
           <Button 
             variant="outline" 
             size="sm"
+            className="whitespace-nowrap bg-secondary hover:bg-secondary/80"
             onClick={() => handleSuggestionClick("Hidden gems in Diani")}
           >
             Hidden gems
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="whitespace-nowrap bg-secondary hover:bg-secondary/80"
+            onClick={() => handleSuggestionClick("Best beaches in Diani")}
+          >
+            Best beaches
           </Button>
         </div>
       </div>
       
       {/* Input Area */}
       <div className="p-4 border-t">
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon">
+        <form 
+          className="flex gap-2" 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+        >
+          <Button 
+            type="button"
+            variant="outline" 
+            size="icon" 
+            onClick={handleAttachmentClick}
+          >
             <Paperclip className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon">
+          <Button 
+            type="button"
+            variant="outline" 
+            size="icon"
+            onClick={handleImageClick}
+          >
             <Image className="h-4 w-4" />
           </Button>
           <Input
             placeholder="Ask me anything about Diani..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
             className="flex-1"
           />
-          <Button variant="outline" size="icon">
+          <Button 
+            type="button"
+            variant="outline" 
+            size="icon"
+            onClick={handleMicClick}
+          >
             <Mic className="h-4 w-4" />
           </Button>
-          <Button onClick={handleSend}>
+          <Button 
+            type="submit"
+            className="bg-ocean hover:bg-ocean-dark"
+          >
             <Send className="h-4 w-4" />
           </Button>
-        </div>
+        </form>
       </div>
     </div>
   );
@@ -192,7 +286,9 @@ const getAIResponse = (input: string): string => {
     return "There are plenty of activities in Diani! You can try kite surfing, visit the Colobus Conservation center, go on a snorkeling trip to see the coral reefs, or simply relax on the beautiful white sand beach. What interests you most?";
   } else if (lowerInput.includes("hidden") || lowerInput.includes("gem") || lowerInput.includes("secret")) {
     return "For a true hidden gem experience, I recommend visiting Kaya Kinondo Sacred Forest, exploring the quieter beaches south of the main strip, or checking out the local craft markets. Do any of these interest you?";
-  } 
+  } else if (lowerInput.includes("beach") || lowerInput.includes("beaches")) {
+    return "Diani Beach is famous for its pristine white sands and crystal clear waters! The main beach stretches for about 10km and is perfect for swimming. For a more secluded experience, check out Galu Beach to the south or Tiwi Beach to the north. Would you like to know more about any specific beach?";
+  }
   
   return "Thanks for your question about Diani Beach! I've found some relevant information that might help you. Would you like more specific details about any particular aspect of your trip?";
 };
